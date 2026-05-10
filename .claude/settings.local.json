@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\ARNAU\\\\OneDrive\\\\Escritorio\\\\Development\\\\Second-Brain\" -Force -Recurse | Format-Table -AutoSize FullName, PSIsContainer, @{Name=\"Type\"; Expression={if \\($_.PSIsContainer\\) { \"Folder\" } else { $_.Extension }}})",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"const { PrismaLibSQL } = require\\('@prisma/adapter-better-sqlite3'\\); console.log\\('OK', typeof PrismaLibSQL\\)\")",
+      "Bash(node -e \"const x = require\\('@prisma/adapter-better-sqlite3'\\); console.log\\(Object.keys\\(x\\)\\)\")",
+      "Bash(node -e \"const { PrismaBetterSqlite3 } = require\\('@prisma/adapter-better-sqlite3'\\); console.log\\(PrismaBetterSqlite3.toString\\(\\).slice\\(0,200\\)\\)\")",
+      "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\ARNAU\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ARNAU-OneDrive-Escritorio-Development-Second-Brain\\\\63296104-c976-416a-a015-85b5120324fc\\\\tasks\\\\bpahzknbk.output' | Select-Object -Last 20\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(taskkill /PID 20204 /F)",
+      "PowerShell(Stop-Process *)"
+    ]
+  }
+}
