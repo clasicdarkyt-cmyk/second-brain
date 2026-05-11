@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { todayString } from "@/lib/utils"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const { id: habitId } = await params
   const body = await req.json()
   const date = body.date ?? todayString()
@@ -12,11 +17,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (existing) {
     if (existing.completed && value === null) {
-      // Toggle off
       await prisma.habitLog.delete({ where: { id: existing.id } })
       return NextResponse.json({ completed: false })
     }
-    // Update value
     const updated = await prisma.habitLog.update({
       where: { id: existing.id },
       data: { completed: true, value },
@@ -31,6 +34,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const { id: habitId } = await params
   const { searchParams } = new URL(req.url)
   const from = searchParams.get("from")

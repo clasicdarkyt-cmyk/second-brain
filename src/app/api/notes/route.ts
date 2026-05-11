@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 import { prisma } from "@/lib/prisma"
 
 function serialize(note: {
@@ -15,12 +17,17 @@ function serialize(note: {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const { searchParams } = new URL(req.url)
   const search = searchParams.get("search")
   const folderId = searchParams.get("folderId")
 
   const notes = await prisma.note.findMany({
     where: {
+      userId,
       ...(search ? {
         OR: [
           { title: { contains: search } },
@@ -36,9 +43,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const body = await req.json()
   const note = await prisma.note.create({
     data: {
+      userId,
       title: body.title ?? "Sin título",
       content: body.content ?? "",
       folderId: body.folderId ?? null,

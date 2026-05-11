@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Folder } from "@/types"
 
@@ -18,7 +20,12 @@ function buildTree(folders: (Folder & { _count: { notes: number } })[]): Folder[
 }
 
 export async function GET() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const folders = await prisma.folder.findMany({
+    where: { userId },
     include: { _count: { select: { notes: true } } },
     orderBy: { name: "asc" },
   })
@@ -32,9 +39,13 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const body = await req.json()
   const folder = await prisma.folder.create({
-    data: { name: body.name, parentId: body.parentId ?? null },
+    data: { userId, name: body.name, parentId: body.parentId ?? null },
   })
   return NextResponse.json(folder, { status: 201 })
 }

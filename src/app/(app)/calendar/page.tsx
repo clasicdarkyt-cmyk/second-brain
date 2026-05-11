@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useForm, Controller } from "react-hook-form"
 import { CalendarEvent } from "@/types"
+import { DayDetailModal } from "@/components/calendar/DayDetailModal"
 
 const EVENT_COLORS = ["#6366f1", "#ec4899", "#f97316", "#22c55e", "#06b6d4", "#a855f7", "#ef4444"]
 
@@ -73,6 +74,8 @@ export default function CalendarPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState("")
   const [selectedColor, setSelectedColor] = useState("#6366f1")
+  const [dayModalDate, setDayModalDate] = useState<Date | null>(null)
+  const [dayModalOpen, setDayModalOpen] = useState(false)
 
   const { register, handleSubmit, control, reset, setValue, formState: { isSubmitting, errors } } =
     useForm<EventFormData>({
@@ -99,6 +102,11 @@ export default function CalendarPage() {
     setSelectedColor("#6366f1")
     reset({ allDay: false, reminder: "none", title: "", description: "", start: "", end: "" })
     setFormOpen(true)
+  }
+
+  function handleDateClick(info: { date: Date; dateStr: string }) {
+    setDayModalDate(info.date)
+    setDayModalOpen(true)
   }
 
   async function onSubmit(data: EventFormData) {
@@ -171,6 +179,7 @@ export default function CalendarPage() {
           events={events.map(toFCEvent)}
           editable
           selectable
+          dateClick={handleDateClick}
           select={(info) => openForm(info.startStr)}
           eventDrop={handleEventDrop}
           eventResize={handleEventResize}
@@ -178,6 +187,14 @@ export default function CalendarPage() {
           height="100%"
         />
       </div>
+
+      <DayDetailModal
+        date={dayModalDate}
+        open={dayModalOpen}
+        onClose={() => setDayModalOpen(false)}
+        events={events}
+        onNewEvent={(date) => openForm(date)}
+      />
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
         <DialogContent className="sm:max-w-md">

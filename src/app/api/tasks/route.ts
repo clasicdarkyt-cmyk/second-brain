@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Task } from "@/types"
 
@@ -21,13 +23,23 @@ function serializeTask(t: {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const { searchParams } = new URL(req.url)
   const status = searchParams.get("status")
   const priority = searchParams.get("priority")
   const due = searchParams.get("due")
+  const date = searchParams.get("date")
 
   const now = new Date()
-  const dueFilter = due === "today"
+  const dueFilter = date
+    ? {
+        gte: new Date(`${date}T00:00:00`),
+        lte: new Date(`${date}T23:59:59`),
+      }
+    : due === "today"
     ? { lte: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59) }
     : due === "week"
     ? { lte: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) }
@@ -35,7 +47,8 @@ export async function GET(req: NextRequest) {
 
   const tasks = await prisma.task.findMany({
     where: {
-      parentId: null,
+      userId,
+      ...(date ? {} : { parentId: null }),
       ...(status && status !== "all" ? { status } : {}),
       ...(priority && priority !== "all" ? { priority } : {}),
       ...(dueFilter ? { dueDate: dueFilter } : {}),
@@ -50,9 +63,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const userId = session.user.id
+
   const body = await req.json()
   const task = await prisma.task.create({
     data: {
+      userId,
       title: body.title,
       description: body.description ?? null,
       status: body.status ?? "todo",

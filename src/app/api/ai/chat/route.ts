@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/auth"
 import { buildContext } from "@/lib/ai-context-builder"
 
 const OLLAMA_BASE = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434"
@@ -11,6 +13,9 @@ Si el usuario pregunta por datos específicos, refiere siempre a la información
 Si no encuentras información relevante en el contexto, dilo claramente.`
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const { messages } = await req.json() as { messages: { role: string; content: string }[] }
 
   const lastUserMsg = messages.findLast((m) => m.role === "user")?.content ?? ""
