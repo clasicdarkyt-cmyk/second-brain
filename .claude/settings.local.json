@@ -14,7 +14,14 @@
       "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\ARNAU\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ARNAU-OneDrive-Escritorio-Development-Second-Brain\\\\63296104-c976-416a-a015-85b5120324fc\\\\tasks\\\\bpahzknbk.output' | Select-Object -Last 20\")",
       "Bash(taskkill /F /IM node.exe)",
       "Bash(taskkill /PID 20204 /F)",
-      "PowerShell(Stop-Process *)"
+      "PowerShell(Stop-Process *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Arnau\\\\Desktop\\\\Money_proyectos\\\\second-brain\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Format-Table)",
+      "Bash(Get-ChildItem *)",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\('next:', p.dependencies.next, 'react:', p.dependencies.react\\)\")",
+      "Bash(npx jsrepo *)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

@@ -1,0 +1,13 @@
+Action plan:
+ - Acabar vista web
+	. Testeo
+		* Errores
+		* Bugs
+		* Uso semiregular
+	. Investigar sobre deployment
+	. Crear tienda de conversion / formas de monetizar x uso (anuncios?)
+ - Crear variacion mobil?
+	. Investigar sobre store, como subir apps y como monetizar
+ - Campaña de advertaising
+	. Tiktok
+	. Instagram
